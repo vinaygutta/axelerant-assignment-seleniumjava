@@ -7,7 +7,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.aventstack.extentreports.Status;
 import com.axelerant.BaseTest;
+import com.axelerant.reports.ExtentReport;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +18,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 public class TestUtils {
 	public static final long WAIT = 30;
@@ -61,6 +64,19 @@ public class TestUtils {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		return dateFormat.format(date);
+	}
+	
+	public String dateTo_mm_dd_yyyy(Date inputDate) {
+
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+		formatter.setTimeZone(TimeZone.getTimeZone("PST"));
+		String strDate = formatter.format(inputDate);
+
+		String datNumb = strDate.split("/")[1];
+		String mnthNumb = strDate.split("/")[0];
+		String yreNumb = strDate.split("/")[2];
+
+		return mnthNumb + "-" + datNumb + "-" + yreNumb;
 	}
 
 	public Logger log() {

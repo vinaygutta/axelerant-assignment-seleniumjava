@@ -114,26 +114,6 @@ public class BaseTest {
 		PageFactory.initElements(factory, this);
 	}
 
-	@BeforeMethod
-	public void beforeMethod() {
-
-	}
-
-	// stop video capturing and create *.mp4 file
-	@AfterMethod
-	public synchronized void afterMethod(ITestResult result) throws Exception {
-
-	}
-
-	@BeforeSuite
-	public void beforeSuite() throws Exception {
-
-	}
-
-//	@AfterSuite
-//	public void afterSuite() {
-
-//	}
 
 	@Parameters({ "browser" })
 	@BeforeTest
@@ -354,25 +334,6 @@ public class BaseTest {
 
 		Actions action = new Actions(getDriver());
 		action.moveToElement(element).build().perform();
-	}
-
-	public synchronized String dateTo_mm_dd_yyyy(Date inputDate) {
-
-		utils.log().info("Converting date to string MM-DD-YYYY");
-		ExtentReport.getTest().log(Status.INFO, "Converting date to string MM-DD-YYYY");
-
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-		formatter.setTimeZone(TimeZone.getTimeZone("PST"));
-		String strDate = formatter.format(inputDate);
-
-		String datNumb = strDate.split("/")[1];
-		String mnthNumb = strDate.split("/")[0];
-		String yreNumb = strDate.split("/")[2];
-
-		utils.log().info("Converted date to " + mnthNumb + "-" + datNumb + "-" + yreNumb);
-		ExtentReport.getTest().log(Status.INFO, "Converted date to " + mnthNumb + "-" + datNumb + "-" + yreNumb);
-
-		return mnthNumb + "-" + datNumb + "-" + yreNumb;
 	}
 
 	@AfterTest

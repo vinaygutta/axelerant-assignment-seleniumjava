@@ -78,7 +78,7 @@ public class AccountTests extends BaseTest {
 
 	}
 
-	@Test(priority=1)
+	@Test(priority = 1)
 	public void checkCreationOfCheckingAccount() {
 
 		leftNavAfterLoginPage = leftNavBeforeLoginPage.loginWithUnamePwd(
@@ -129,7 +129,7 @@ public class AccountTests extends BaseTest {
 		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
 		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
 
-		Assert.assertEquals(act_tab_row1.get(0), dateTo_mm_dd_yyyy(new Date()));
+		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
 		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
 		Assert.assertEquals(act_tab_row1.get(2), "");
 		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
@@ -137,7 +137,7 @@ public class AccountTests extends BaseTest {
 		leftNavAfterLoginPage.logOut();
 	}
 
-	@Test(priority=2)
+	@Test(priority = 2)
 	public void checkCreationOfSavingsAccount() {
 
 		leftNavAfterLoginPage = leftNavBeforeLoginPage.loginWithUnamePwd(
@@ -186,18 +186,18 @@ public class AccountTests extends BaseTest {
 		Assert.assertEquals(act_tab_header.get(1), getStrings().get("header2_accountactivity_table"));
 		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
 		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
-		
-		Assert.assertEquals(act_tab_row1.get(0), dateTo_mm_dd_yyyy(new Date()));
+
+		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
 		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
 		Assert.assertEquals(act_tab_row1.get(2), "");
 		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
 
 		leftNavAfterLoginPage.logOut();
 	}
-	
-	@Test(priority=3)
+
+	@Test(priority = 3)
 	public void billPayFromChkAccToSavAcc() {
-		
+
 		Faker fake = new Faker();
 		String fn = fake.address().firstName();
 		HashMap<String, String> data = new HashMap<>();
@@ -214,7 +214,7 @@ public class AccountTests extends BaseTest {
 
 		billPaymentPage = leftNavAfterLoginPage.clickBillPay();
 		waitForSeconds(2);
-		
+
 		data.put("payee", fn);
 		data.put("addr", fake.address().streetName());
 		data.put("city", fake.address().city());
@@ -224,20 +224,24 @@ public class AccountTests extends BaseTest {
 		data.put("account", savAccountNumber);
 		data.put("amount", "200");
 		data.put("fromaccount", chkAccountNumber);
-		
+
 		billPaymentCompletePage = billPaymentPage.billPay(data);
-		
+
 		String act_billPaymsg = billPaymentCompletePage.getTxtPaySuccessLabel();
 		String exp_billPaymsg = getStrings().get("pay_complete_label");
-		
-		Assert.assertEquals(act_billPaymsg, exp_billPaymsg);
-		
-		accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
-		
-		accountDetailsPage = accountOverviewPage.clickAccountNbr(chkAccountNumber);
-		
-		waitForSeconds(5);
 
+		Assert.assertEquals(act_billPaymsg, exp_billPaymsg);
+
+		accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
+
+		/*
+		 * The below checks the details of the checking account number after bill pay
+		 * successful
+		 */
+
+		accountDetailsPage = accountOverviewPage.clickAccountNbr(chkAccountNumber);
+
+		waitForSeconds(5);
 
 		String act_accountNbr = accountDetailsPage.getaccountNumberLabelTxt();
 		String act_accountType = accountDetailsPage.getaccountTypeLabelTxt();
@@ -262,24 +266,27 @@ public class AccountTests extends BaseTest {
 		Assert.assertEquals(act_tab_header.get(1), getStrings().get("header2_accountactivity_table"));
 		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
 		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
-		
-		Assert.assertEquals(act_tab_row1.get(0), dateTo_mm_dd_yyyy(new Date()));
+
+		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
 		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
 		Assert.assertEquals(act_tab_row1.get(2), "");
 		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
-		
-		Assert.assertEquals(act_tab_row2.get(0), dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_tab_row2.get(1), "Bill Payment to "+fn);
+
+		Assert.assertEquals(act_tab_row2.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
+		Assert.assertEquals(act_tab_row2.get(1), "Bill Payment to " + fn);
 		Assert.assertEquals(act_tab_row2.get(2), "$200.00");
 		Assert.assertEquals(act_tab_row2.get(3), "");
-		
-		
-accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
-		
-		accountDetailsPage = accountOverviewPage.clickAccountNbr(savAccountNumber);
-		
-		waitForSeconds(5);
 
+		accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
+
+		/*
+		 * The below checks the details of the savings account number after bill pay
+		 * successful
+		 */
+
+		accountDetailsPage = accountOverviewPage.clickAccountNbr(savAccountNumber);
+
+		waitForSeconds(5);
 
 		String act_savaccountNbr = accountDetailsPage.getaccountNumberLabelTxt();
 		String act_savaccountType = accountDetailsPage.getaccountTypeLabelTxt();
@@ -304,14 +311,14 @@ accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
 		Assert.assertEquals(act_savtab_header.get(1), getStrings().get("header2_accountactivity_table"));
 		Assert.assertEquals(act_savtab_header.get(2), getStrings().get("header3_accountactivity_table"));
 		Assert.assertEquals(act_savtab_header.get(3), getStrings().get("header4_accountactivity_table"));
-		
-		Assert.assertEquals(act_savtab_row1.get(0), dateTo_mm_dd_yyyy(new Date()));
+
+		Assert.assertEquals(act_savtab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
 		Assert.assertEquals(act_savtab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
 		Assert.assertEquals(act_savtab_row1.get(2), "");
 		Assert.assertEquals(act_savtab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
-		
-		Assert.assertEquals(act_savtab_row2.get(0), dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_savtab_row2.get(1), "Bill Payment from "+fn);
+
+		Assert.assertEquals(act_savtab_row2.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
+		Assert.assertEquals(act_savtab_row2.get(1), "Bill Payment from " + fn);
 		Assert.assertEquals(act_savtab_row2.get(2), "");
 		Assert.assertEquals(act_savtab_row2.get(3), "$200.00");
 
