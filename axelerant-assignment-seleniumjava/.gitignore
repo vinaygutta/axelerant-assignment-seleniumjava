@@ -2,7 +2,7 @@
 *.class
 
 # Log file
-#*.log
+*.log
 
 # BlueJ files
 *.ctxt
@@ -26,11 +26,12 @@ hs_err_pid*
 .settings
 Screenshots
 target
+customtestoutput
 test-output
 videos
 .DS_Store
 .idea/
 .zprofile
-#*.html
+*.html
 *.iml
 logs
