@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Suite" parallel="false">
+<!-- 
+	<test name="chrome">
+		<listeners>
+			<listener class-name="com.axelerant.listeners.TestListener" />
+		</listeners>
+		<parameter name="browser" value="chrome" />
+		<classes>
+			<class name="com.axelerant.tests.LoginTests">
+
+				<methods> <include name="submitReviewFourStars" /> </methods>
+			</class>
+			<class name="com.axelerant.tests.AccountTests" />
+		</classes>
+	</test> -->
+	
+	<test name="firefox">
+		<listeners>
+			<listener class-name="com.axelerant.listeners.TestListener" />
+		</listeners>
+		<parameter name="browser" value="firefox" />
+		<classes>
+			<class name="com.axelerant.tests.LoginTests">
+
+				<!-- <methods> <include name="submitReviewFourStars" /> </methods> -->
+			</class>
+			<class name="com.axelerant.tests.AccountTests" />
+		</classes>
+	</test>
+</suite> <!-- Suite -->

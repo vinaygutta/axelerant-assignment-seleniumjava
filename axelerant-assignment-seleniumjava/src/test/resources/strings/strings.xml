@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!-- Login Page -->
+	<string name="welcome_label">Welcome John Smith</string>
+	
+	<!-- Account creation success Page -->
+	<string name="congrats_label">Congratulations, your account is now open.</string>
+	
+	<!-- Account Details Page -->
+	<string name="accountType_chk_label">CHECKING</string>
+	<string name="accountType_sav_label">SAVINGS</string>
+	<string name="balance_label">$100.00</string>
+	<string name="availableBalance_label">$100.00</string>
+	
+	<string name="header1_accountactivity_table">Date</string>
+	<string name="header2_accountactivity_table">Transaction</string>
+	<string name="header3_accountactivity_table">Debit (-)</string>
+	<string name="header4_accountactivity_table">Credit (+)</string>
+	
+	<string name="row1col2_accountactivity_table">Funds Transfer Received</string>
+	<string name="row1col4_accountactivity_table">$100.00</string>
+	
+	<!-- Bill Pay Complete Page -->
+	<string name="pay_complete_label">Bill Payment Complete</string>
+	
+</resources>
