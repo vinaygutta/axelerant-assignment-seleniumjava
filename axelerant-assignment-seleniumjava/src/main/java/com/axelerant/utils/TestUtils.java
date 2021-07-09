@@ -11,6 +11,12 @@ import com.aventstack.extentreports.Status;
 import com.axelerant.BaseTest;
 import com.axelerant.reports.ExtentReport;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
@@ -22,6 +28,7 @@ import java.util.TimeZone;
 
 public class TestUtils {
 	public static final long WAIT = 30;
+	private final String KILL = "taskkill /F /IM ";
 	
 	public HashMap<String, String> parseStringXML(InputStream file) throws Exception{
 		HashMap<String, String> stringMap = new HashMap<String, String>();
@@ -81,6 +88,50 @@ public class TestUtils {
 
 	public Logger log() {
 		return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
+	}
+	
+	public String loginViaWebService(String contentType, String url, String method, String uname, String password) {
+		log().info("Logging to " + url);
+		ExtentReport.getTest().log(Status.INFO, "Logging to " + url);
+		String jsid = "";
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse(contentType);
+		RequestBody body = RequestBody.create(mediaType, "username="+uname+"&password="+password);
+		Request request = new Request.Builder()
+		  .url(url)
+		  .method(method, body)
+		  .addHeader("Content-Type", contentType)
+		  .build();
+		try {
+			Response response = client.newCall(request).execute();
+			String responseStr = response.toString();
+			log().info("Logging response " + response.toString());
+			ExtentReport.getTest().log(Status.INFO, "Logging response " + response.toString());
+			int jsStart = response.toString().indexOf("jsessionid");
+			
+			jsid = responseStr.substring(jsStart+11, responseStr.length()-1);
+			log().info("JSESSION ID is " +jsid);
+			ExtentReport.getTest().log(Status.INFO, "JSESSION ID is " +jsid);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "";
+		}
+		return jsid;
+	}
+	
+	public void killProcess(String serviceName) {
+
+		try {
+			Runtime.getRuntime().exec(KILL + serviceName);
+			Thread.sleep(5000);
+			// System.out.println(serviceName + " killed successfully!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 }
