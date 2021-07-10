@@ -1,11 +1,12 @@
 package com.axelerant.listeners;
 
-import com.aventstack.extentreports.MediaEntityBuilder;
-import com.aventstack.extentreports.Status;
-import com.axelerant.BaseTest;
-import com.axelerant.pages.LeftNavAfterLoginPage;
-import com.axelerant.reports.ExtentReport;
-import com.axelerant.utils.TestUtils;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -16,13 +17,11 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.Status;
+import com.axelerant.BaseTest;
+import com.axelerant.reports.ExtentReport;
+import com.axelerant.utils.TestUtils;
 
 public class TestListener implements ITestListener {
 	TestUtils utils = new TestUtils();

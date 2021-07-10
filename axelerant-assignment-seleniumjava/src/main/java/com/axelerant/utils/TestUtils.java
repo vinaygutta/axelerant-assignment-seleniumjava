@@ -1,5 +1,16 @@
 package com.axelerant.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.TimeZone;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -8,7 +19,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.aventstack.extentreports.Status;
-import com.axelerant.BaseTest;
 import com.axelerant.reports.ExtentReport;
 
 import okhttp3.MediaType;
@@ -16,15 +26,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.TimeZone;
 
 public class TestUtils {
 	public static final long WAIT = 30;
