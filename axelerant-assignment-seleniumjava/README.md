@@ -2,11 +2,11 @@
 
 Technologies used:
 1. Selenium Web Driver.
-2. TestNG.
-3. Maven.
-4. Extent Reports.
-5. Log4J.
-6. Applitools
+2. JDK.
+3. TestNG.
+4. Maven.
+5. Extent Reports.
+6. Log4J.
 
 How To Run:
 1. Install JDK 1.8 and setup environment variables.
@@ -76,69 +76,3 @@ a. The bill pay should be successful.
 b. On the first account details the balance should be $300.
 c. On the second account details the balance should be -$100.
 d. The transaction details should be appropriate with date and credit, debit details.
-
-Below is the project folder structure:
-
-
-|   pom.xml
-|   README.md
-|   testng.xml
-|       
-+---customtestoutput
-|   +---2021-07-08
-|   |   +---ExtentReports
-|   |   |       Extent_2021-07-08-14-01-29.html
-|   |   |       
-|   |   \---Screenshots
-|   |       \---firefox
-|   |           \---AccountTests
-|   |                   billPayFromChkAccToSavAcc_2021-07-08-14-01-29.png
-|   |                   
-|   \---logs
-|       \---firefox
-|               application.log
-|               
-+---src
-|   +---main
-|   |   +---java
-|   |   |   \---com
-|   |   |       \---axelerant
-|   |   |           |   BaseTest.java
-|   |   |           |   
-|   |   |           +---listeners
-|   |   |           |       TestListener.java
-|   |   |           |       
-|   |   |           +---pages
-|   |   |           |       AccountDetailsPage.java
-|   |   |           |       AccountOpenedSuccessPage.java
-|   |   |           |       AccountsOverviewPage.java
-|   |   |           |       BillPaymentCompletePage.java
-|   |   |           |       BillPaymentPage.java
-|   |   |           |       LeftNavAfterLoginPage.java
-|   |   |           |       LeftNavBeforeLoginPage.java
-|   |   |           |       OpenNewAccountPage.java
-|   |   |           |       
-|   |   |           +---reports
-|   |   |           |       ExtentReport.java
-|   |   |           |       
-|   |   |           \---utils
-|   |   |                   TestUtils.java
-|   |   |                   
-|   |   \---resources
-|   |           config.properties
-|   |           log4j2.xml
-|   |           
-|   \---test
-|       +---java
-|       |   \---com
-|       |       \---axelerant
-|       |           \---tests
-|       |                   AccountTests.java
-|       |                   LoginTests.java
-|       |                   
-|       \---resources
-|           +---data
-|           |       loginUsers.json
-|           |       
-|           \---strings
-|                   strings.xml

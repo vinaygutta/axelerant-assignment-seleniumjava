@@ -1,11 +1,8 @@
 package com.axelerant.pages;
 
 import java.util.HashMap;
-import java.util.List;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
 import com.axelerant.BaseTest;
 
 public class BillPaymentPage extends BaseTest {
