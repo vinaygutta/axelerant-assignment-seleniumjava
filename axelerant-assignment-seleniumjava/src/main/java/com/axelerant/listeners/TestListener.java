@@ -72,8 +72,6 @@ public class TestListener implements ITestListener {
 		ExtentReport.getTest().fail("Test Failed", MediaEntityBuilder
 				.createScreenCaptureFromBase64String(new String(encoded, StandardCharsets.US_ASCII)).build());
 		ExtentReport.getTest().fail(result.getThrowable());
-		
-		new LeftNavAfterLoginPage().logOut();
 	}
 
 	@Override

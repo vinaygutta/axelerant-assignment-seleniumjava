@@ -1,6 +1,7 @@
 package com.axelerant;
 
 import com.aventstack.extentreports.Status;
+import com.axelerant.eyes.EyesManager;
 import com.axelerant.reports.ExtentReport;
 import com.axelerant.utils.TestUtils;
 
@@ -52,6 +53,7 @@ public class BaseTest {
 	protected static ThreadLocal<String> browser = new ThreadLocal<String>();
 	protected static ThreadLocal<String> dateTime = new ThreadLocal<String>();
 	private static ThreadLocal<String> dateStr = new ThreadLocal<String>();
+	protected static ThreadLocal<EyesManager> eyesManager = new ThreadLocal<>();
 
 	TestUtils utils = new TestUtils();
 
@@ -61,6 +63,14 @@ public class BaseTest {
 
 	public void setDriver(WebDriver driver2) {
 		driver.set(driver2);
+	}
+	
+	public void setEyesManager(EyesManager eyesManager2) {
+		eyesManager.set(eyesManager2);
+	}
+	
+	public EyesManager getEyesManager() {
+		return eyesManager.get();
 	}
 
 	public String getDateStr() {
@@ -106,6 +116,21 @@ public class BaseTest {
 	public BaseTest() {
 		AjaxElementLocatorFactory factory = new AjaxElementLocatorFactory(getDriver(), 30);
 		PageFactory.initElements(factory, this);
+	}
+	
+	@BeforeClass
+	public synchronized void beforeClass() {
+		WebDriver driver = getDriver();
+		System.out.println(driver);
+
+		EyesManager eyesManager1 = new EyesManager(driver, "Para Bank");
+		setEyesManager(eyesManager1);
+
+	}
+	
+	@AfterClass
+	public synchronized void afterClass() {
+		getEyesManager().abort();
 	}
 
 	@Parameters({ "browser" })

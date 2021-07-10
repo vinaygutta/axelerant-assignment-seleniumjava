@@ -29,50 +29,48 @@ import java.util.TimeZone;
 public class TestUtils {
 	public static final long WAIT = 30;
 	private final String KILL = "taskkill /F /IM ";
-	
-	public HashMap<String, String> parseStringXML(InputStream file) throws Exception{
+
+	public HashMap<String, String> parseStringXML(InputStream file) throws Exception {
 		HashMap<String, String> stringMap = new HashMap<String, String>();
-		//Get Document Builder
+		// Get Document Builder
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		 
-		//Build Document
+
+		// Build Document
 		Document document = builder.parse(file);
-		 
-		//Normalize the XML Structure; It's just too important !!
+
+		// Normalize the XML Structure; It's just too important !!
 		document.getDocumentElement().normalize();
-		 
-		//Here comes the root node
-		//Element root = document.getDocumentElement();
-		 
-		//Get all elements
+
+		// Here comes the root node
+		// Element root = document.getDocumentElement();
+
+		// Get all elements
 		NodeList nList = document.getElementsByTagName("string");
-		 
-		for (int temp = 0; temp < nList.getLength(); temp++)
-		{
-		 Node node = nList.item(temp);
-		 if (node.getNodeType() == Node.ELEMENT_NODE)
-		 {
-		    Element eElement = (Element) node;
-		    // Store each element key value in map
-		    stringMap.put(eElement.getAttribute("name"), eElement.getTextContent());
-		 }
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+			Node node = nList.item(temp);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) node;
+				// Store each element key value in map
+				stringMap.put(eElement.getAttribute("name"), eElement.getTextContent());
+			}
 		}
 		return stringMap;
 	}
-	
+
 	public String dateTime() {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
-	
+
 	public String dateStr() {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
-	
+
 	public String dateTo_mm_dd_yyyy(Date inputDate) {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -89,36 +87,93 @@ public class TestUtils {
 	public Logger log() {
 		return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
 	}
-	
+
 	public String loginViaWebService(String contentType, String url, String method, String uname, String password) {
 		log().info("Logging to " + url);
 		ExtentReport.getTest().log(Status.INFO, "Logging to " + url);
 		String jsid = "";
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		MediaType mediaType = MediaType.parse(contentType);
-		RequestBody body = RequestBody.create(mediaType, "username="+uname+"&password="+password);
-		Request request = new Request.Builder()
-		  .url(url)
-		  .method(method, body)
-		  .addHeader("Content-Type", contentType)
-		  .build();
+		RequestBody body = RequestBody.create(mediaType, "username=" + uname + "&password=" + password);
+		Request request = new Request.Builder().url(url).method(method, body).addHeader("Content-Type", contentType)
+				.build();
 		try {
 			Response response = client.newCall(request).execute();
 			String responseStr = response.toString();
 			log().info("Logging response " + response.toString());
 			ExtentReport.getTest().log(Status.INFO, "Logging response " + response.toString());
 			int jsStart = response.toString().indexOf("jsessionid");
-			
-			jsid = responseStr.substring(jsStart+11, responseStr.length()-1);
-			log().info("JSESSION ID is " +jsid);
-			ExtentReport.getTest().log(Status.INFO, "JSESSION ID is " +jsid);
+
+			jsid = responseStr.substring(jsStart + 11, responseStr.length() - 1);
+			log().info("JSESSION ID is " + jsid);
+			ExtentReport.getTest().log(Status.INFO, "JSESSION ID is " + jsid);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "";
 		}
 		return jsid;
 	}
-	
+
+	public String createAccountWebService(String jsessionid, String url, String method) {
+		String responseStr = "";
+		log().info("Creating account from " + url);
+		ExtentReport.getTest().log(Status.INFO, "Creating account from " + url);
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		MediaType mediaType = MediaType.parse("text/plain");
+		RequestBody body = RequestBody.create(mediaType, "");
+		Request request = new Request.Builder().url(url).method(method, body)
+				.addHeader("Cookie", "JSESSIONID=" + jsessionid).build();
+		try {
+			Response response = client.newCall(request).execute();
+			if (response.code()!=200) {
+				responseStr = "Error";
+			} else {
+			responseStr = response.body().string();
+			}
+			log().info("Logging response " + responseStr);
+			ExtentReport.getTest().log(Status.INFO, "Logging response " + responseStr);
+		} catch (IOException e) {
+			e.printStackTrace();
+			responseStr = "Error";
+		}
+		return responseStr;
+	}
+
+	public String billPayWebService(String jsessionid, String url, String method, String jsonData) {
+		String responseStr = "";
+		log().info("Bill Pay from " + url);
+		ExtentReport.getTest().log(Status.INFO, "Bill Pay from " + url);
+		
+		log().info("Bill Pay service payload " + jsonData);
+		ExtentReport.getTest().log(Status.INFO, "Bill Pay service payload " + jsonData);
+
+		OkHttpClient client2 = new OkHttpClient().newBuilder().build();
+		MediaType mediaType2 = MediaType.parse("application/json");
+		RequestBody body2 = RequestBody.create(mediaType2,
+				jsonData);
+		Request request2 = new Request.Builder()
+				.url(url)
+				.method(method, body2)
+				.addHeader("Cookie", "JSESSIONID="+jsessionid)
+				.addHeader("Content-Type", "application/json")
+				.build();
+		try {
+			Response response = client2.newCall(request2).execute();
+			if (response.code()!=200) {
+				responseStr = "Error";
+			} else {
+			responseStr = response.body().string();
+			}
+			log().info("Logging response " + responseStr);
+			ExtentReport.getTest().log(Status.INFO, "Logging response " + responseStr);
+		} catch (IOException e) {
+			e.printStackTrace();
+			responseStr = "Error";
+		}
+
+		return responseStr;
+	}
+
 	public void killProcess(String serviceName) {
 
 		try {
@@ -133,5 +188,5 @@ public class TestUtils {
 		}
 
 	}
-	
+
 }

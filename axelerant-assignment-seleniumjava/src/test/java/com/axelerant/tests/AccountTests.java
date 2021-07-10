@@ -1,15 +1,11 @@
 package com.axelerant.tests;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -24,7 +20,11 @@ import com.axelerant.pages.BillPaymentPage;
 import com.axelerant.pages.LeftNavAfterLoginPage;
 import com.axelerant.pages.LeftNavBeforeLoginPage;
 import com.axelerant.pages.OpenNewAccountPage;
+import com.axelerant.pojos.BillPayAddress;
+import com.axelerant.pojos.BillPayData;
 import com.axelerant.utils.TestUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 
 public class AccountTests extends BaseTest {
@@ -42,7 +42,7 @@ public class AccountTests extends BaseTest {
 	String chkAccountNumber;
 
 	@BeforeClass
-	public void beforeClass() throws Exception {
+	public void initLogin() {
 		InputStream datais = null;
 		try {
 			String dataFileName = "data/loginUsers.json";
@@ -54,21 +54,23 @@ public class AccountTests extends BaseTest {
 			throw e;
 		} finally {
 			if (datais != null) {
-				datais.close();
+				try {
+					datais.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-	}
 
-	@AfterClass
-	public void afterClass() {
+		getEyesManager().setBatchName("Account Tests batch");
+
 	}
 
 	@BeforeMethod
 	public void beforeMethod(Method m) {
 		utils.log().info(
 				"\n\n" + "**********************\n starting test:" + m.getName() + "\n**********************" + "\n");
-		getDriver().get(getProps().getProperty("siteURL"));
-		getDriver().manage().window().maximize();
+
 		leftNavBeforeLoginPage = new LeftNavBeforeLoginPage();
 
 	}
@@ -76,251 +78,185 @@ public class AccountTests extends BaseTest {
 	@AfterMethod
 	public void afterMethod() {
 
+		getEyesManager().abort();
+
 	}
+	
+	/*
+	 * This test will perform the below.
+	 * 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+	 * 2. Assert that jsession id is generated in the response.
+	 * 3. Create a CHECKING account using Webservice.
+	 * 4. Assert the response if the account type is CHECKING.
+	 * 5. Open the browser and open the home page url login.
+	 * 6. Open the newly created CHECKING account page.
+	 * 7. Perform visual check using APPLITOOLS.
+	 */
 
 	@Test(priority = 1)
-	public void checkCreationOfCheckingAccount() {
+	public void checkCreationOfCheckingAccountWithAPI() {
+
+		String jseid = utils.loginViaWebService("application/x-www-form-urlencoded",
+				getProps().getProperty("wsLoginURL"), "POST",
+				loginUsers.getJSONObject("validUser").getString("username"),
+				loginUsers.getJSONObject("validUser").getString("password"));
+
+		Assert.assertEquals(jseid.equalsIgnoreCase(""), false);
+		waitForSeconds(5);
+
+		String response = utils.createAccountWebService(jseid,
+				getProps().getProperty("wsbURL")+"/createAccount?customerId=12212&newAccountType=0&fromAccountId=12345",
+				"POST");
+		
+		Assert.assertNotEquals(response,"Error");
+
+		JSONObject accountCreated = new JSONObject(response);
+
+		Assert.assertEquals(accountCreated.getString("type"), "CHECKING");
+		chkAccountNumber = accountCreated.get("id").toString();
+
+		getDriver().get(getProps().getProperty("siteURL"));
+		getDriver().manage().window().maximize();
 
 		leftNavAfterLoginPage = leftNavBeforeLoginPage.loginWithUnamePwd(
 				loginUsers.getJSONObject("validUser").getString("username"),
 				loginUsers.getJSONObject("validUser").getString("password"));
-
-		String act_welcomelabel = leftNavAfterLoginPage.getWelcomeLabel();
-		String exp_welcomelabel = getStrings().get("welcome_label");
-
-		Assert.assertEquals(act_welcomelabel, exp_welcomelabel);
-		waitForSeconds(5);
-
-		openNewAccountPage = leftNavAfterLoginPage.clickOpenNewAccountLink();
-		waitForSeconds(5);
-		accountOpenedSuccessPage = openNewAccountPage.openNewAccount("CHECKING");
-
-		String act_congratsTxt = accountOpenedSuccessPage.getCongratsTxt();
-		chkAccountNumber = accountOpenedSuccessPage.getCreatedAccountNumber();
-		String exp_congratsTxt = getStrings().get("congrats_label");
-
-		Assert.assertEquals(act_congratsTxt, exp_congratsTxt);
-		waitForSeconds(5);
-
-		accountDetailsPage = accountOpenedSuccessPage.clickNewAccountNumberLink();
+		leftNavAfterLoginPage.clickAccountsOverview().clickAccountNbr(chkAccountNumber);
 
 		waitForSeconds(5);
 
-		String act_accountNbr = accountDetailsPage.getaccountNumberLabelTxt();
-		String act_accountType = accountDetailsPage.getaccountTypeLabelTxt();
-		String act_balance = accountDetailsPage.getbalanceLabelTxt();
-		String act_availbalance = accountDetailsPage.getAvailableBalanceLabelTxt();
-
-		List<String> act_tab_header = accountDetailsPage.getAccountActivityTableHeader();
-		List<String> act_tab_row1 = accountDetailsPage.getAccountActivityTableRow1();
-
-		String exp_accountNbr = chkAccountNumber;
-		String exp_accountType = getStrings().get("accountType_chk_label");
-		String exp_balance = getStrings().get("balance_label");
-		String exp_availbalance = getStrings().get("availableBalance_label");
-
-		Assert.assertEquals(act_accountNbr, exp_accountNbr);
-		Assert.assertEquals(act_accountType, exp_accountType);
-		Assert.assertEquals(act_balance, exp_balance);
-		Assert.assertEquals(act_availbalance, exp_availbalance);
-
-		Assert.assertEquals(act_tab_header.get(0), getStrings().get("header1_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(1), getStrings().get("header2_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
-
-		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
-		Assert.assertEquals(act_tab_row1.get(2), "");
-		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
+		getEyesManager().validateWindow();
 
 		leftNavAfterLoginPage.logOut();
 	}
+	
+	/*
+	 * This test will perform the below.
+	 * 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+	 * 2. Assert that jsession id is generated in the response.
+	 * 3. Create a SAVINGS account using Webservice.
+	 * 4. Assert the response if the account type is SAVINGS.
+	 * 5. Open the browser and open the home page url login.
+	 * 6. Open the newly created SAVINGS account page.
+	 * 7. Perform visual check using APPLITOOLS.
+	 */
 
 	@Test(priority = 2)
-	public void checkCreationOfSavingsAccount() {
+	public void checkCreationOfSavingsAccountWithAPI() {
+
+		String jseid = utils.loginViaWebService("application/x-www-form-urlencoded",
+				getProps().getProperty("wsLoginURL"), "POST",
+				loginUsers.getJSONObject("validUser").getString("username"),
+				loginUsers.getJSONObject("validUser").getString("password"));
+
+		Assert.assertEquals(jseid.equalsIgnoreCase(""), false);
+		waitForSeconds(5);
+
+		String response = utils.createAccountWebService(jseid,
+				getProps().getProperty("wsbURL")+"/createAccount?customerId=12212&newAccountType=1&fromAccountId=12345",
+				"POST");
+		
+		Assert.assertNotEquals(response,"Error");
+
+		JSONObject accountCreated = new JSONObject(response);
+
+		Assert.assertEquals(accountCreated.getString("type"), "SAVINGS");
+		savAccountNumber = accountCreated.get("id").toString();
+
+		getDriver().get(getProps().getProperty("siteURL"));
+		getDriver().manage().window().maximize();
 
 		leftNavAfterLoginPage = leftNavBeforeLoginPage.loginWithUnamePwd(
 				loginUsers.getJSONObject("validUser").getString("username"),
 				loginUsers.getJSONObject("validUser").getString("password"));
-
-		String act_welcomelabel = leftNavAfterLoginPage.getWelcomeLabel();
-		String exp_welcomelabel = getStrings().get("welcome_label");
-
-		Assert.assertEquals(act_welcomelabel, exp_welcomelabel);
-		waitForSeconds(5);
-
-		openNewAccountPage = leftNavAfterLoginPage.clickOpenNewAccountLink();
-		waitForSeconds(5);
-		accountOpenedSuccessPage = openNewAccountPage.openNewAccount("SAVINGS");
-		String act_congratsTxt = accountOpenedSuccessPage.getCongratsTxt();
-		savAccountNumber = accountOpenedSuccessPage.getCreatedAccountNumber();
-		String exp_congratsTxt = getStrings().get("congrats_label");
-
-		Assert.assertEquals(act_congratsTxt, exp_congratsTxt);
-		waitForSeconds(5);
-
-		accountDetailsPage = accountOpenedSuccessPage.clickNewAccountNumberLink();
+		leftNavAfterLoginPage.clickAccountsOverview().clickAccountNbr(savAccountNumber);
 
 		waitForSeconds(5);
 
-		String act_accountNbr = accountDetailsPage.getaccountNumberLabelTxt();
-		String act_accountType = accountDetailsPage.getaccountTypeLabelTxt();
-		String act_balance = accountDetailsPage.getbalanceLabelTxt();
-		String act_availbalance = accountDetailsPage.getAvailableBalanceLabelTxt();
-
-		List<String> act_tab_header = accountDetailsPage.getAccountActivityTableHeader();
-		List<String> act_tab_row1 = accountDetailsPage.getAccountActivityTableRow1();
-
-		String exp_accountNbr = savAccountNumber;
-		String exp_accountType = getStrings().get("accountType_sav_label");
-		String exp_balance = getStrings().get("balance_label");
-		String exp_availbalance = getStrings().get("availableBalance_label");
-
-		Assert.assertEquals(act_accountNbr, exp_accountNbr);
-		Assert.assertEquals(act_accountType, exp_accountType);
-		Assert.assertEquals(act_balance, exp_balance);
-		Assert.assertEquals(act_availbalance, exp_availbalance);
-
-		Assert.assertEquals(act_tab_header.get(0), getStrings().get("header1_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(1), getStrings().get("header2_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
-
-		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
-		Assert.assertEquals(act_tab_row1.get(2), "");
-		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
+		getEyesManager().validateWindow();
 
 		leftNavAfterLoginPage.logOut();
 	}
+	
+	/*
+	 * This test will perform the below.
+	 * 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+	 * 2. Assert that jsession id is generated in the response.
+	 * 3. Perform a Bill Pay from CHECKING account to SAVINGS account using Webservice.
+	 * 4. Assert the response if the payee name is correct.
+	 * 5. Assert the response if the from account id is correct.
+	 * 6. Open the browser and open the home page url login.
+	 * 7. Open the SAVINGS account page.
+	 * 8. Perform visual check using APPLITOOLS.
+	 * 9. Open the CHECKING account page.
+	 * 10. Perform visual check using APPLITOOLS.
+	 */
 
 	@Test(priority = 3)
-	public void billPayFromChkAccToSavAcc() {
+	public void billPayFromChkAccToSavAccWithAPI() {
 
 		Faker fake = new Faker();
 		String fn = fake.address().firstName();
-		HashMap<String, String> data = new HashMap<>();
 
+		String jseid = utils.loginViaWebService("application/x-www-form-urlencoded",
+				getProps().getProperty("wsLoginURL"), "POST",
+				loginUsers.getJSONObject("validUser").getString("username"),
+				loginUsers.getJSONObject("validUser").getString("password"));
+
+		Assert.assertEquals(jseid.equalsIgnoreCase(""), false);
+		waitForSeconds(5);
+
+		BillPayAddress billPayAddress = new BillPayAddress();
+
+		billPayAddress.setCity(fake.address().city());
+		billPayAddress.setState(fake.address().state());
+		billPayAddress.setStreet(fake.address().streetName());
+		billPayAddress.setZipCode(fake.address().zipCode());
+
+		BillPayData billPayData = new BillPayData();
+		billPayData.setAddress(billPayAddress);
+		billPayData.setName(fn);
+		billPayData.setAccountNumber(savAccountNumber);
+		billPayData.setPhoneNumber(fake.phoneNumber().cellPhone());
+
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonInString="";
+		try {
+			jsonInString = mapper.writeValueAsString(billPayData);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
+		String response = utils.billPayWebService(jseid,
+				getProps().getProperty("wsbURL")+"/billpay?accountId=" + chkAccountNumber
+						+ "&amount=200",
+				"POST", jsonInString);
+
+		Assert.assertNotEquals(response,"Error");
+		
+		JSONObject billPayresponse = new JSONObject(response);
+		
+		Assert.assertEquals(billPayresponse.getString("payeeName"), fn);
+		Assert.assertEquals(billPayresponse.get("accountId").toString(), chkAccountNumber);
+		
+		getDriver().get(getProps().getProperty("siteURL"));
+		getDriver().manage().window().maximize();
+		
 		leftNavAfterLoginPage = leftNavBeforeLoginPage.loginWithUnamePwd(
 				loginUsers.getJSONObject("validUser").getString("username"),
 				loginUsers.getJSONObject("validUser").getString("password"));
 
-		String act_welcomelabel = leftNavAfterLoginPage.getWelcomeLabel();
-		String exp_welcomelabel = getStrings().get("welcome_label");
-
-		Assert.assertEquals(act_welcomelabel, exp_welcomelabel);
-		waitForSeconds(5);
-
-		billPaymentPage = leftNavAfterLoginPage.clickBillPay();
-		waitForSeconds(2);
-
-		data.put("payee", fn);
-		data.put("addr", fake.address().streetName());
-		data.put("city", fake.address().city());
-		data.put("state", fake.address().state());
-		data.put("zip", fake.address().zipCode());
-		data.put("phone", fake.phoneNumber().cellPhone());
-		data.put("account", savAccountNumber);
-		data.put("amount", "200");
-		data.put("fromaccount", chkAccountNumber);
-
-		billPaymentCompletePage = billPaymentPage.billPay(data);
-
-		String act_billPaymsg = billPaymentCompletePage.getTxtPaySuccessLabel();
-		String exp_billPaymsg = getStrings().get("pay_complete_label");
-
-		Assert.assertEquals(act_billPaymsg, exp_billPaymsg);
-
-		accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
-
-		/*
-		 * The below checks the details of the checking account number after bill pay
-		 * successful
-		 */
-
-		accountDetailsPage = accountOverviewPage.clickAccountNbr(chkAccountNumber);
+		leftNavAfterLoginPage.clickAccountsOverview().clickAccountNbr(savAccountNumber);
 
 		waitForSeconds(5);
 
-		String act_accountNbr = accountDetailsPage.getaccountNumberLabelTxt();
-		String act_accountType = accountDetailsPage.getaccountTypeLabelTxt();
-		String act_balance = accountDetailsPage.getbalanceLabelTxt();
-		String act_availbalance = accountDetailsPage.getAvailableBalanceLabelTxt();
+		getEyesManager().validateWindow();
 
-		List<String> act_tab_header = accountDetailsPage.getAccountActivityTableHeader();
-		List<String> act_tab_row1 = accountDetailsPage.getAccountActivityTableRow1();
-		List<String> act_tab_row2 = accountDetailsPage.getAccountActivityTableRow2();
-
-		String exp_accountNbr = chkAccountNumber;
-		String exp_accountType = getStrings().get("accountType_chk_label");
-		String exp_balance = "-$100.00";
-		String exp_availbalance = "$0.00";
-
-		Assert.assertEquals(act_accountNbr, exp_accountNbr);
-		Assert.assertEquals(act_accountType, exp_accountType);
-		Assert.assertEquals(act_balance, exp_balance);
-		Assert.assertEquals(act_availbalance, exp_availbalance);
-
-		Assert.assertEquals(act_tab_header.get(0), getStrings().get("header1_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(1), getStrings().get("header2_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(2), getStrings().get("header3_accountactivity_table"));
-		Assert.assertEquals(act_tab_header.get(3), getStrings().get("header4_accountactivity_table"));
-
-		Assert.assertEquals(act_tab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_tab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
-		Assert.assertEquals(act_tab_row1.get(2), "");
-		Assert.assertEquals(act_tab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
-
-		Assert.assertEquals(act_tab_row2.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_tab_row2.get(1), "Bill Payment to " + fn);
-		Assert.assertEquals(act_tab_row2.get(2), "$200.00");
-		Assert.assertEquals(act_tab_row2.get(3), "");
-
-		accountOverviewPage = leftNavAfterLoginPage.clickAccountsOverview();
-
-		/*
-		 * The below checks the details of the savings account number after bill pay
-		 * successful
-		 */
-
-		accountDetailsPage = accountOverviewPage.clickAccountNbr(savAccountNumber);
+		leftNavAfterLoginPage.clickAccountsOverview().clickAccountNbr(chkAccountNumber);
 
 		waitForSeconds(5);
 
-		String act_savaccountNbr = accountDetailsPage.getaccountNumberLabelTxt();
-		String act_savaccountType = accountDetailsPage.getaccountTypeLabelTxt();
-		String act_savbalance = accountDetailsPage.getbalanceLabelTxt();
-		String act_savavailbalance = accountDetailsPage.getAvailableBalanceLabelTxt();
-
-		List<String> act_savtab_header = accountDetailsPage.getAccountActivityTableHeader();
-		List<String> act_savtab_row1 = accountDetailsPage.getAccountActivityTableRow1();
-		List<String> act_savtab_row2 = accountDetailsPage.getAccountActivityTableRow2();
-
-		String exp_savaccountNbr = savAccountNumber;
-		String exp_savaccountType = getStrings().get("accountType_sav_label");
-		String exp_savbalance = "$300.00";
-		String exp_savavailbalance = "$300.00";
-
-		Assert.assertEquals(act_savaccountNbr, exp_savaccountNbr);
-		Assert.assertEquals(act_savaccountType, exp_savaccountType);
-		Assert.assertEquals(act_savbalance, exp_savbalance);
-		Assert.assertEquals(act_savavailbalance, exp_savavailbalance);
-
-		Assert.assertEquals(act_savtab_header.get(0), getStrings().get("header1_accountactivity_table"));
-		Assert.assertEquals(act_savtab_header.get(1), getStrings().get("header2_accountactivity_table"));
-		Assert.assertEquals(act_savtab_header.get(2), getStrings().get("header3_accountactivity_table"));
-		Assert.assertEquals(act_savtab_header.get(3), getStrings().get("header4_accountactivity_table"));
-
-		Assert.assertEquals(act_savtab_row1.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_savtab_row1.get(1), getStrings().get("row1col2_accountactivity_table"));
-		Assert.assertEquals(act_savtab_row1.get(2), "");
-		Assert.assertEquals(act_savtab_row1.get(3), getStrings().get("row1col4_accountactivity_table"));
-
-		Assert.assertEquals(act_savtab_row2.get(0), utils.dateTo_mm_dd_yyyy(new Date()));
-		Assert.assertEquals(act_savtab_row2.get(1), "Bill Payment from " + fn);
-		Assert.assertEquals(act_savtab_row2.get(2), "");
-		Assert.assertEquals(act_savtab_row2.get(3), "$200.00");
+		getEyesManager().validateWindow();
 
 		leftNavAfterLoginPage.logOut();
 	}

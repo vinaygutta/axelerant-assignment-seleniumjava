@@ -11,129 +11,63 @@ Technologies used:
 How To Run:
 1. Install JDK 1.8 and setup environment variables.
 2. Install Maven and setup environment variables.
-3. Copy the project folder to the computer.
-4. Open command prompt and navigate to the project folder.
-5. Type "mvn clean test".
+3. Ensure that the Para Bank portal contains a account number "12345".
+4. Copy the project folder to the computer.
+5. Modify the textng.xml file appropriately.
+6. Ensure that API KEY for APPLITOOLS exist.
+7. Open command prompt and navigate to the project folder.
+8. Type "mvn clean test -Dapplitools.api.key=63pZnpOVB5A7tQW5o57MxeyBgriwL889pPqdE1hL56M111 -Dvisual.tests=true".
+	-- if visual.tests flag is set to false, visual test will not be performed.
 
-Below Test Cases are Automated:
+Below are the details of the test classes in the testng.xml:
 
-URL: https://parabank.parasoft.com/parabank/index.htm
+com.axelerant.tests.LoginTests: This contains one test named checkLoginWithWebService.
 
-TC1: 
-1. Open the above URL.
-2. Enter appropriate username and password and Login.
-3. Logout.
+This test will perform the below.
 
-Expected Result: Login Logout should be successful.
+ 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+ 2. Assert that jsession id is generated in the response.
+ 3. Open the browser and open the home page url and visual check using APPLITOOLS.
+ 
+com.axelerant.tests.AccountTests: This contains 3 tests.
+ 
+checkCreationOfCheckingAccountWithAPI
 
-TC2:
-1. Open the above URL.
-2. Enter appropriate username and password and Login.
-3. Click on Open New Account link.
-4. Choose CHECKING as type of account.
-5. Click on open new account button.
-6. Open the account details of newly created account.
-
-Expected Result:
-a. The new account creation should be successful.
-b. On the account details page, the account number should be correct one.
-c. On the account details page, the account type should be CHECKING.
-d. On the account details page, the account balance should be $100.00.
-e. On the account details page, the account available balance should be $100.00.
-f. The date and transaction details should be appropriate.
-
-TC3:
-1. Open the above URL.
-2. Enter appropriate username and password and Login.
-3. Click on Open New Account link.
-4. Choose SAVINGS as type of account.
-5. Click on open new account button.
-6. Open the account details of newly created account.
-
-Expected Result:
-a. The new account creation should be successful.
-b. On the account details page, the account number should be correct one.
-c. On the account details page, the account type should be SAVINGS.
-d. On the account details page, the account balance should be $100.00.
-e. On the account details page, the account available balance should be $100.00.
-f. The date and transaction details should be appropriate.
-
-TC4:
-1. Open the above URL.
-2. Enter appropriate username and password and Login.
-3. Click on Bill Pay link.
-4. Enter appropriate details and choose accounts from TC2 and TC3 and amount $200.
-5. Click Send Payment.
-6. Check account details of each account.
-
-Expected Result:
-a. The bill pay should be successful.
-b. On the first account details the balance should be $300.
-c. On the second account details the balance should be -$100.
-d. The transaction details should be appropriate with date and credit, debit details.
-
-Below is the project folder structure:
-
-
-|   pom.xml
-|   README.md
-|   testng.xml
-|       
-+---customtestoutput
-|   +---2021-07-08
-|   |   +---ExtentReports
-|   |   |       Extent_2021-07-08-14-01-29.html
-|   |   |       
-|   |   \---Screenshots
-|   |       \---firefox
-|   |           \---AccountTests
-|   |                   billPayFromChkAccToSavAcc_2021-07-08-14-01-29.png
-|   |                   
-|   \---logs
-|       \---firefox
-|               application.log
-|               
-+---src
-|   +---main
-|   |   +---java
-|   |   |   \---com
-|   |   |       \---axelerant
-|   |   |           |   BaseTest.java
-|   |   |           |   
-|   |   |           +---listeners
-|   |   |           |       TestListener.java
-|   |   |           |       
-|   |   |           +---pages
-|   |   |           |       AccountDetailsPage.java
-|   |   |           |       AccountOpenedSuccessPage.java
-|   |   |           |       AccountsOverviewPage.java
-|   |   |           |       BillPaymentCompletePage.java
-|   |   |           |       BillPaymentPage.java
-|   |   |           |       LeftNavAfterLoginPage.java
-|   |   |           |       LeftNavBeforeLoginPage.java
-|   |   |           |       OpenNewAccountPage.java
-|   |   |           |       
-|   |   |           +---reports
-|   |   |           |       ExtentReport.java
-|   |   |           |       
-|   |   |           \---utils
-|   |   |                   TestUtils.java
-|   |   |                   
-|   |   \---resources
-|   |           config.properties
-|   |           log4j2.xml
-|   |           
-|   \---test
-|       +---java
-|       |   \---com
-|       |       \---axelerant
-|       |           \---tests
-|       |                   AccountTests.java
-|       |                   LoginTests.java
-|       |                   
-|       \---resources
-|           +---data
-|           |       loginUsers.json
-|           |       
-|           \---strings
-|                   strings.xml
+ 
+ This test will perform the below.
+ 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+ 2. Assert that jsession id is generated in the response.
+ 3. Create a CHECKING account using Webservice.
+ 4. Assert the response if the account type is CHECKING.
+ 5. Open the browser and open the home page url login.
+ 6. Open the newly created CHECKING account page.
+ 7. Perform visual check using APPLITOOLS.
+ 
+ checkCreationOfSavingsAccountWithAPI
+ 
+ 
+ This test will perform the below.
+ 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+ 2. Assert that jsession id is generated in the response.
+ 3. Create a SAVINGS account using Webservice.
+ 4. Assert the response if the account type is SAVINGS.
+ 5. Open the browser and open the home page url login.
+ 6. Open the newly created SAVINGS account page.
+ 7. Perform visual check using APPLITOOLS.
+ 
+ 
+ billPayFromChkAccToSavAccWithAPI
+ 
+ 
+ This test will perform the below.
+ 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+ 2. Assert that jsession id is generated in the response.
+ 3. Perform a Bill Pay from CHECKING account to SAVINGS account using Webservice.
+ 4. Assert the response if the payee name is correct.
+ 5. Assert the response if the from account id is correct.
+ 6. Open the browser and open the home page url login.
+ 7. Open the SAVINGS account page.
+ 8. Perform visual check using APPLITOOLS.
+ 9. Open the CHECKING account page.
+ 10. Perform visual check using APPLITOOLS.
+ 

@@ -27,6 +27,8 @@
 					</suiteXmlFiles>
 					<systemPropertyVariables>
 						<outputFolder>customtestoutput</outputFolder>
+						<applitools.api.key>63pZnpOVB5A7tQW5o57MxeyBgriwL889pPqdE1hL56M111</applitools.api.key>
+						<visual.tests>false</visual.tests>
 					</systemPropertyVariables>
 					<properties>
 						<property>
@@ -50,6 +52,7 @@
 		<faker.version>1.0.2</faker.version>
 		<okhttp.version>3.11.0</okhttp.version>
 		<applitools.version>3.205.0</applitools.version>
+		<jackson.version>2.12.4</jackson.version>
 	</properties>
 
 	<dependencies>
@@ -133,6 +136,28 @@
 			<groupId>com.applitools</groupId>
 			<artifactId>eyes-selenium-java3</artifactId>
 			<version>${applitools.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 

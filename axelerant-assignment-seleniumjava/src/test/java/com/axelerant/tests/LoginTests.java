@@ -1,5 +1,6 @@
 package com.axelerant.tests;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
@@ -20,6 +21,7 @@ import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.axelerant.BaseTest;
+import com.axelerant.eyes.EyesManager;
 import com.axelerant.pages.LeftNavAfterLoginPage;
 import com.axelerant.pages.LeftNavBeforeLoginPage;
 import com.axelerant.utils.TestUtils;
@@ -29,13 +31,9 @@ public class LoginTests extends BaseTest {
 	LeftNavBeforeLoginPage leftNavBeforeLoginPage;
 	JSONObject loginUsers;
 	TestUtils utils = new TestUtils();
-	EyesRunner runner;
-	Eyes eyes;
-	static BatchInfo batch;
-	final boolean runWithEyes = false;
 
 	@BeforeClass
-	public void beforeClass() throws Exception {
+	public void initLogin() {
 		InputStream datais = null;
 		try {
 			String dataFileName = "data/loginUsers.json";
@@ -47,17 +45,18 @@ public class LoginTests extends BaseTest {
 			throw e;
 		} finally {
 			if (datais != null) {
-				datais.close();
+				try {
+					datais.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+		
+	
 
-		if (runWithEyes) {
-			batch = new BatchInfo("Demo batch");
-		}
-	}
+		 getEyesManager().setBatchName("Login Tests batch");
 
-	@AfterClass
-	public void afterClass() {
 	}
 
 	@BeforeMethod
@@ -65,49 +64,42 @@ public class LoginTests extends BaseTest {
 		utils.log().info(
 				"\n\n" + "**********************\n starting test:" + m.getName() + "\n**********************" + "\n");
 
-		if (runWithEyes) {
-			runner = new ClassicRunner();
-			eyes = new Eyes(runner);
-			if (isNullOrEmpty(System.getProperty("APPLITOOLS_API_KEY"))) {
-				utils.log().info(new RuntimeException(
-						"No API Key found; Please set environment variable 'APPLITOOLS_API_KEY'."));
-				throw new RuntimeException("No API Key found; Please set environment variable 'APPLITOOLS_API_KEY'.");
-			}
-			eyes.setApiKey(System.getProperty("APPLITOOLS_API_KEY"));
-			eyes.setBatch(batch);
-		}
+
+		
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		if (runWithEyes) {
-			eyes.abortIfNotClosed();			
-			TestResultsSummary allTestResults = runner.getAllTestResults();			
-			utils.log().info(allTestResults);
-		}
+
+		getEyesManager().abort();
+
+
 	}
 
+	/*
+	 * This test will perform the below.
+	 * 1. Login to the portal using webservice/ajax mode and extract the JSESSION ID.
+	 * 2. Assert that jsession id is generated in the response.
+	 * 3. Open the browser and open the home page url and visual check using APPLITOOLS.
+	 */
 	@Test
 	public void checkLoginWithWebService() {
 
 		String jseid = utils.loginViaWebService("application/x-www-form-urlencoded",
-				"https://parabank.parasoft.com/parabank/login.htm", "POST",
+				getProps().getProperty("wsLoginURL"), "POST",
 				loginUsers.getJSONObject("validUser").getString("username"),
 				loginUsers.getJSONObject("validUser").getString("password"));
 
 		Assert.assertEquals(jseid.equalsIgnoreCase(""), false);
 		waitForSeconds(5);
 
-		if (runWithEyes) {
-			eyes.open(getDriver(), "Demo App", "Login With WebService Test", new RectangleSize(1280, 657));
-		}
+		
 
 		getDriver().get(getProps().getProperty("siteURL") + ";jsessionid=" + jseid);
 		getDriver().manage().window().maximize();
 
-		if (runWithEyes) {
-			eyes.checkWindow("Logged in page");
-			eyes.closeAsync();
-		}
+		getEyesManager().validateWindow();
+
+
 	}
 }
