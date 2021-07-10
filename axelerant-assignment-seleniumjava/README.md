@@ -70,4 +70,3 @@ checkCreationOfCheckingAccountWithAPI
  8. Perform visual check using APPLITOOLS.
  9. Open the CHECKING account page.
  10. Perform visual check using APPLITOOLS.
- 
