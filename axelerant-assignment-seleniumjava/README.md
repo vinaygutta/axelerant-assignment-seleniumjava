@@ -12,8 +12,13 @@ How To Run:
 1. Install JDK 1.8 and setup environment variables.
 2. Install Maven and setup environment variables.
 3. Copy the project folder to the computer.
+4. Open testng.xml file and modify appropriately
 4. Open command prompt and navigate to the project folder.
 5. Type "mvn clean test".
+
+Below are the test classes in testng.xml
+com.axelerant.tests.LoginTests
+com.axelerant.tests.AccountTests
 
 Below Test Cases are Automated:
 
