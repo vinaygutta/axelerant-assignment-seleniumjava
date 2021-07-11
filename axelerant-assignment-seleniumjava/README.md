@@ -11,10 +11,13 @@ Technologies used:
 How To Run:
 1. Install JDK 1.8 and setup environment variables.
 2. Install Maven and setup environment variables.
-3. Copy the project folder to the computer.
-4. Open testng.xml file and modify appropriately
-4. Open command prompt and navigate to the project folder.
-5. Type "mvn clean test".
+3. Install chrome or firefox or edge.
+4. Copy the project folder to the computer.
+5. Open testng.xml file and modify appropriately
+6. Open command prompt and navigate to the project folder.
+7. Type "mvn clean test".
+
+Extent Reports and Logs are created in "customtestoutput" folder under project root folder.
 
 Below are the test classes in testng.xml
 com.axelerant.tests.LoginTests
