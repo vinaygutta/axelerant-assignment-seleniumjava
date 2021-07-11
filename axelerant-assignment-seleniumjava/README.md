@@ -11,13 +11,16 @@ Technologies used:
 How To Run:
 1. Install JDK 1.8 and setup environment variables.
 2. Install Maven and setup environment variables.
-3. Ensure that the Para Bank portal contains a account number "12345".
-4. Copy the project folder to the computer.
-5. Modify the textng.xml file appropriately.
-6. Ensure that API KEY for APPLITOOLS exist.
-7. Open command prompt and navigate to the project folder.
-8. Type "mvn clean test -Dapplitools.api.key=63pZnpOVB5A7tQW5o57MxeyBgriwL889pPqdE1hL56M111 -Dvisual.tests=true".
+3. Install Chrome or Firefox or Edge browser.
+4. Ensure that the Para Bank portal contains a account number "12345".
+5. Copy the project folder to the computer.
+6. Modify the textng.xml file appropriately.
+7. Ensure that API KEY for APPLITOOLS exist.
+8. Open command prompt and navigate to the project folder.
+9. Type "mvn clean test -Dapplitools.api.key=63pZnpOVB5A7tQW5o57MxeyBgriwL889pPqdE1hL56M111 -Dvisual.tests=true".
 	-- if visual.tests flag is set to false, visual test will not be performed.
+	OR
+	Type "mvn clean test" (in this case visual tests will be skipped)
 
 Below are the details of the test classes in the testng.xml:
 

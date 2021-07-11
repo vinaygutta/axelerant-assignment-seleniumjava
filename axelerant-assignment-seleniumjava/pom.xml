@@ -27,7 +27,7 @@
 					</suiteXmlFiles>
 					<systemPropertyVariables>
 						<outputFolder>customtestoutput</outputFolder>
-						<applitools.api.key>63pZnpOVB5A7tQW5o57MxeyBgriwL889pPqdE1hL56M111</applitools.api.key>
+						<applitools.api.key>apikey</applitools.api.key>
 						<visual.tests>false</visual.tests>
 					</systemPropertyVariables>
 					<properties>
