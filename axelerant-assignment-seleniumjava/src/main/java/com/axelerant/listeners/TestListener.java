@@ -58,6 +58,12 @@ public class TestListener implements ITestListener {
 
 		String completeImagePath = System.getProperty("user.dir") + File.separator + imagePath;
 
+		try {
+			FileUtils.copyFile(file, new File(imagePath));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ExtentReport.getTest().fail("Test Failed",
 				MediaEntityBuilder.createScreenCaptureFromPath(completeImagePath).build());
 		ExtentReport.getTest().fail("Test Failed", MediaEntityBuilder
