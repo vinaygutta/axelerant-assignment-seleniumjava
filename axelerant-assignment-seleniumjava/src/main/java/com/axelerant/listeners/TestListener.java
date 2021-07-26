@@ -56,16 +56,7 @@ public class TestListener implements ITestListener {
 				+ result.getName() + "_" + base.getDateTime() + ".png";
 
 		String completeImagePath = System.getProperty("user.dir") + File.separator + imagePath;
-
-		try {
-			FileUtils.copyFile(file, new File(imagePath));
-			Reporter.log("This is the sample screenshot");
-			Reporter.log("<a href='" + completeImagePath + "'> <img src='" + completeImagePath
-					+ "' height='400' width='400'/> </a>");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		ExtentReport.getTest().fail("Test Failed",
 				MediaEntityBuilder.createScreenCaptureFromPath(completeImagePath).build());
 		ExtentReport.getTest().fail("Test Failed", MediaEntityBuilder
